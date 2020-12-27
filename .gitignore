@@ -1,3 +1,15 @@
+#custom
+bin/
+*.o
+*.bin
+.vscode/
+*.pdf
+.vscode/settings.json
+
+
+
+
+
 # Prerequisites
 *.d
 
