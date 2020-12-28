@@ -1,4 +1,5 @@
 #custom
+.git/
 bin/
 *.o
 *.bin
