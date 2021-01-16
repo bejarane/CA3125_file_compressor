@@ -10,11 +10,7 @@
 //
 //  To-do       :
 //      Proceso de arbol de huffman
-//              [] Leer archivo por bytes
-//              [] Clasificar cada byte
-//              [] Crear un diccionario para contar incidencias de cada byte
-//              [] Recorrer el archivo clasificando y actualizando diccionario
-//              [] Ordenar diccionario de mayor a menor
+//              [] Libreria de estadistica
 //              [] Crear arbol binario a partir de diccionario
 //              [] Recorrer arbol resultado
 //              [] Extraer las claves de indice para cada byte
@@ -22,10 +18,31 @@
 //              [] Leer el archivo byte a byte
 //              [] Exportar en txt el indice de compresión	
 //              [] Exportar el archivo de salida con bytes sustituidos
-// Proceso de descompresión
-//              [] Leer el indice de compresion
-//              [] Leer el comprimido por fragmentos
-//              [] Exportar el archivo original al sustituir fragmentos
 //
 //  Git repository: https://github.com/bejarane/CA3125_file_compressor
 ////////////////////////////////////////////////////////////////////
+#include "./source/estadistica.h"
+
+int main(int argc, char** argv){
+    if (argc>1){
+        std::string ruta = argv[1];
+        estadistica lectura;
+
+        std::cout << "Inicio" << std::endl;
+
+
+        lectura.open(ruta);
+        lectura.conteo();
+        std::cout<<"Creararbol"<<std::endl;
+        lectura.Crearbol();
+        lectura.indexado();
+        lectura.comprimir();
+
+
+        return 1;
+    }else{
+        std::cout << "Debe incluir ruta de archivo a comprimir" << std::endl;
+
+        return 0;
+    }
+}
