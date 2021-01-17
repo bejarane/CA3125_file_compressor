@@ -6,4 +6,4 @@ edit:
 
 clean:
 	(cd compresor; make clean)
-	(cd compresor; make clean)
+	(cd descompresor; make clean)

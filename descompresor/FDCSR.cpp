@@ -3,7 +3,7 @@
 //  Project     : FileDeCompreSsoR
 //  File        : FDCSR.cpp
 //  Description :
-//      Archivo principal. Contiene el llamado a funciones de descompresion. Preferible usar comandos de línea.
+//      Archivo principal. Contiene el llamado a funciones de descompresion.
 //
 //  Authors     : E. Rodriguez
 //
@@ -22,16 +22,15 @@ int main(int argc, char** argv){
         decompresor lectura(rutaC,rutaT,rutaS);
 
         std::cout << "Inicio" << std::endl;
-        //std::cout << rutaT << std::endl;
 
-        lectura.leertabla();
-        lectura.descomprimir();
+        lectura.leertabla();//genera arbol de huffman a partir de tabla
+        lectura.descomprimir();//descomprime el archivo
 
+        std::cout << "Completado" << std::endl;
 
         return 1;
     }else{
         std::cout << "Debe incluir ruta de archivo a descomprimir" << std::endl;
-
         return 0;
     }
 }

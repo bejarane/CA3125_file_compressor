@@ -21,7 +21,6 @@ FDCSR.o: FDCSR.cpp $(SOURCE)/$(HEADER)
 .PHONY: clean
 clean:
 	rm $(OUTDIR)/$(OUT) $(OBJ)
-	rmdir $(OUTDIR)
 
 run:
 	$(OUTDIR)/$(OUT)

@@ -15,3 +15,15 @@
 
 >>./comprimir.bin ./test_files/test_5.txt
 >>./descomprimir.bin ./test_files/test_5.txt.huff ./test_files/test_5.txt.table ./test_files/test_5_dhuff.txt
+
+
+
+        /**
+         * para escribir https://courses.cs.vt.edu/~cs2604/fall00/binio.html
+        */
+
+ //https://www.cplusplus.com/reference/fstream/ifstream/open/
+
+//traversing unordered map https://www.geeksforgeeks.org/unordered_map-in-cpp-stl/
+
+//contador de bits http://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetNaive
