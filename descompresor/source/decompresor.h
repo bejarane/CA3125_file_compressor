@@ -44,6 +44,7 @@ struct traductor{
     unsigned long int escritos;
     hojaD *buffer;
     unsigned long int fileBytes;
+    char longitudruta =0;
 
     void inicio(std::string _Rsalida){
         raizT = new hojaD(35);
@@ -59,15 +60,15 @@ struct traductor{
      * @param ruta entero que contiene la máscara de bits
      * @return entero, la cantidad de bits encendidos dentro de la máscara
      */
-    int cuentaBits(unsigned int ruta){
-        int contador; //maximo 9
+    int cuentaBits(unsigned long int ruta){
+        int contador; //maximo 64
         for (contador = 0; ruta; contador++){
             ruta = ruta>>1; // clear the least significant bit set
         }
         return contador; 
     }
 
-    void agregar(char valor, unsigned int ruta){
+    void agregar(char valor, unsigned long int ruta){
         int bits = cuentaBits(ruta)-1; //se le resta el 1 que no fue agregado en la compresion
         hojaD* hoja = raizT;
         //std::cout<<"agregar"<<std::bitset<9>(ruta)<<"\t";
@@ -131,7 +132,7 @@ struct traductor{
 
     void cerrar(){
         Fsalida.clear();Fsalida.close();
-        if (buffer != raizT){
+        if (fileBytes != escritos){
             std::cout << "Error de descompresion" << std::endl;
         }
     }
@@ -154,7 +155,7 @@ struct decompresor{
         std::ifstream Ftabla;
         Ftabla.open(Rtabla, std::ios::in | std::ios::binary);
 
-        char buffer[9];
+        char buffer[12];//mayor a un long long int de 64 bits + 1 byte de valor
         long long int lectura = 0;
         
         Ftabla.read(buffer,8);
@@ -166,23 +167,30 @@ struct decompresor{
             tamano |= buffer[j]&0xff;
             //std::cout<<"tamano archivo"<<std::bitset<64>(tamano)<<std::endl;
         }
-        
         index.fileBytes = tamano;
-        std::cout<<"tamano archivo"<<(index.fileBytes)<<std::endl;
+        std::cout<<"Archivo original: "<<(index.fileBytes)<<" B"<<std::endl;
 
-        while(Ftabla.read(buffer, 3)){
+        Ftabla.read(buffer,1);
+        index.longitudruta = buffer[0];
+        std::cout<<"Longitud de ruta: "<<(int)(index.longitudruta)<< " B"<<std::endl;
+
+
+        while(Ftabla.read(buffer, (1+index.longitudruta))){
             char valor = buffer[0];
-            char b = buffer[1];
-            char c = buffer[2];
-            unsigned int ruta = (b<<8)|(c&0xff);
-
+            unsigned long int ruta = 0;
+            char j;
+            for (j=0;j<index.longitudruta-1;j++){
+                ruta |= (buffer[j+1]&0xff);
+                ruta = ruta<<8;
+            }
+            ruta |= (buffer[j+1]&0xff);
             index.agregar(valor,ruta);
-            lectura+=3;
+            lectura+=1+index.longitudruta;
         }
         //alcanza EOF
         //std::cout<<"val leido"<<index.raizT->derecha->valor<<std::endl;
 
-        std::cout << "Bytes leídos tabla: "<< lectura << std::endl;
+        //std::cout << "Bytes leídos tabla: "<< lectura << std::endl;
         Ftabla.clear();Ftabla.close();
     }
 
@@ -208,8 +216,9 @@ struct decompresor{
             lectura++;
         }
         //alcanza EOF
-        std::cout << "Bytes leídos comprimido: "<< lectura << std::endl;
-        std::cout << "Bytes escritos: "<< index.escritos << std::endl;
+        std::cout << "Comprimido: "<< lectura << " B" << std::endl;
+        std::cout << "Escrito: "<< index.escritos<< " B" << std::endl;
+        index.cerrar();
         Fcomprimido.clear();Fcomprimido.close();
 
 

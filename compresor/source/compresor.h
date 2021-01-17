@@ -64,11 +64,20 @@ struct comparadorInv{
 struct arbol {
     hoja *raiz;
     std::vector<int> niveles;
-    std::unordered_map<char,unsigned int>index; //la entrada es un byte y el arbol de 
-    //maximo tamaño requiere 9 niveles, es decir, 2 bytes de ruta
+    std::unordered_map<char,unsigned long int>index; //la entrada es un byte y el arbol de 
+    //maximo tamaño esperado es 64 bits
+    unsigned long int maxruta=0;
 
     arbol(){
         niveles.push_back(0);
+    }
+
+    char cuentaBytes(unsigned long int ruta){
+        char contador; //maximo 9
+        for (contador = 0; ruta; contador++){
+            ruta = ruta>>8; // clear the least significant bit set
+        }
+        return contador; 
     }
 
     void asignar(){
@@ -83,7 +92,7 @@ struct arbol {
         asignar(raiz->izquierda,1,0b11);
     }
 
-    void asignar(hoja* nodo, int nivel,unsigned int ruta){
+    void asignar(hoja* nodo, int nivel,unsigned long int ruta){
         if (niveles[0]<nivel){
             niveles[0]++; //inicia un nuevo nivel
             niveles.push_back(0);
@@ -95,6 +104,7 @@ struct arbol {
         if(nodo->derecha == nullptr && nodo->izquierda==nullptr){
             //inserta una ruta
             //std::cout<< "ruta: " << std::bitset<9>(ruta)<<std::endl;
+            maxruta = ruta>maxruta?ruta:maxruta;
             index[nodo->valor] = ruta;
             return;
         }
@@ -137,7 +147,7 @@ struct escritor{
         }
         output.close();
 
-        std::cout<<"Bytes escritos: "<<escritos<<std::endl;
+        std::cout<<"Escritos: "<<escritos << " B"<<std::endl;
     }
 };
 
@@ -154,7 +164,7 @@ struct compresor {
     std::priority_queue <hoja*,std::vector<hoja*>,comparador> frecuencia;
     std::priority_queue <hoja*,std::vector<hoja*>,comparadorInv> tabla_frecuencia;
     arbol Arbol;
-    unsigned long int fileBytes = 0;
+    unsigned long int fileBytes=0;
 
     void open(std::string _ruta){
         ruta = _ruta;
@@ -174,12 +184,12 @@ struct compresor {
             lectura ++;
         }
         //alcanza EOF
-        std::cout << "Bytes leídos: "<< lectura << std::endl;
+        std::cout << "Leídos: "<< lectura << " B" << std::endl;
 
         fileBytes = lectura;
         File.clear();File.close();
 
-        std::cout << "Tamaño índice: " << registro.size() << std::endl;
+        std::cout << "Tamaño del índice: " << registro.size() << " Nodos" << std::endl;
 
         //traversing unordered map https://www.geeksforgeeks.org/unordered_map-in-cpp-stl/
         for (auto nodo : registro){
@@ -213,10 +223,10 @@ struct compresor {
 
     void indexado(){
         Arbol.asignar();
-        std::cout<< "Indexu" << Arbol.index.size()<<std::endl;;
-        for (auto _libro : Arbol.index){
-            std::cout << "Valor: "<< (_libro.first) << " Ruta: " << std::bitset<24>(_libro.second) << std::endl;
-        }
+        //std::cout<< "Indexu" << Arbol.index.size()<<std::endl;;
+        /*for (auto _libro : Arbol.index){
+            std::cout << "Valor: "<< std::bitset<12>(_libro.first)<< " Ruta: " << std::hex<<(_libro.second) << std::endl;
+        }*/
     }
 
     void comprimir(){
@@ -244,7 +254,7 @@ struct compresor {
             //std::cout << "registro" << registro[buffer[0]] << std::endl;
             lectura ++;
         }
-        std::cout<< "Indexu" << Arbol.index.size()<<std::endl;;
+        //std::cout<< "Indexu" << Arbol.index.size()<<std::endl;;
         //std::cout << "Leidos: " << lectura << " bytes\n";
         salida.cerrar();
         File.clear();File.close();
@@ -305,17 +315,30 @@ struct compresor {
         std::ofstream tabla(ruta+".table");
         //int size = 2; //dos bytes para ruta
         //tabla << size <<'\n';
+        //8 bytes para tamaño
         for (int j = 7; j>=0;j--){
             char s = (fileBytes>>(8*j))&0xff;
             tabla << s;
         }
+        
+        //calcular tamaño de ruta
+        char anchoruta = Arbol.cuentaBytes(Arbol.maxruta);
+        //std::cout<<"Max ruta: "<<std::bitset<32>(Arbol.maxruta)<<std::endl;
+        std::cout<<"Longitud de ruta: "<<(int)(anchoruta)<< " B"<<std::endl;
+        tabla << anchoruta; //un byte para guardar los tamaños de ruta
 
-        for(auto _libro : Arbol.index){//recordar que el index está al revés
+        for(auto _libro : Arbol.index){
             char a = _libro.first;
-            char b = (_libro.second>>8)&0xff;
+            tabla << a;
+            for (int j=anchoruta-1; j>0;j--){
+                char b = (_libro.second>>(8*j))&0xff;
+                tabla<<b;
+            }
             char c = (_libro.second)&0xff;
-            tabla << a << b << c;
+            tabla << c;
+            
         }
+
         tabla.clear(); tabla.close();
     }
 };
