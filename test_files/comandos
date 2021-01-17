@@ -1,0 +1,11 @@
+>>./comprimir.bin ./test_files/test_0.jpg
+>>./descomprimir.bin ./test_files/test_0.jpg.huff ./test_files/test_0.jpg.table ./test_files/test_0_dhuff.jpg
+
+>>./comprimir.bin ./test_files/test_3.png
+>>./descomprimir.bin ./test_files/test_3.png.huff ./test_files/test_3.png.table ./test_files/test_3_dhuff.png
+
+>>./comprimir.bin ./test_files/test_4.flac
+>>./descomprimir.bin ./test_files/test_4.flac.huff ./test_files/test_4.flac.table ./test_files/test_4_dhuff.flac
+
+>>./comprimir.bin ./test_files/test_5.txt
+>>./descomprimir.bin ./test_files/test_5.txt.huff ./test_files/test_5.txt.table ./test_files/test_5_dhuff.txt
