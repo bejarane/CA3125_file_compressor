@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
 
-///////// 2020. GNU GENERAL PUBLIC LICENSE /////////////////////////
+///////// 2021. GNU GENERAL PUBLIC LICENSE /////////////////////////
 //
 //  Project     : FileCompreSsoR
 //  File        : compresor.h
